@@ -32,6 +32,8 @@ export const createProjectSchema = projectSchema
     title: z.string().min(1, "Project title is required."),
   });
 
+export const updateProjectSchema = createProjectSchema.partial();
+
 export const counterSchema = z.object({
   id: z.string(),
   projectId: z.string(),
@@ -59,5 +61,6 @@ export const customSectionSchema = z.object({
 export type ProjectStatus = z.infer<typeof projectStatusSchema>;
 export type Project = z.infer<typeof projectSchema>;
 export type CreateProjectInput = z.infer<typeof createProjectSchema>;
+export type UpdateProjectInput = z.infer<typeof updateProjectSchema>;
 export type Counter = z.infer<typeof counterSchema>;
 export type CustomSection = z.infer<typeof customSectionSchema>;

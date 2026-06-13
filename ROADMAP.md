@@ -21,6 +21,8 @@ Status: scaffolded.
 - Delete projects
 - Replace sample data with API-backed state
 
+Status: implemented for project records.
+
 ## Phase 3: Counters
 
 - Add counters

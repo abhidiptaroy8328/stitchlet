@@ -5,6 +5,9 @@
 - Expanded the main app shell width so Stitchlet uses more available desktop space.
 - Moved desktop sidebar navigation closer to the logo while keeping local archive details anchored near the bottom.
 - Adjusted the dashboard grid to show smaller project cards across wider screens.
+- Added SQLite-backed project CRUD with API routes for create, list, read, update, and delete.
+- Wired the dashboard, create project page, and project detail page to the project API instead of static sample project data.
+- Added Vitest coverage for the project CRUD API.
 
 ## 2026-06-12
 

@@ -1,11 +1,117 @@
-import { ArrowLeft, Download, FileText, Minus, Pencil, Plus } from "lucide-react";
-import { Link, useParams } from "react-router-dom";
-import { sampleCounters, sampleProjects, sampleSections } from "../../shared/sample-data";
+import { ArrowLeft, Download, FileText, Minus, Pencil, Plus, Trash2 } from "lucide-react";
+import { type FormEvent, useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { sampleCounters, sampleSections } from "../../shared/sample-data";
+import type { Project } from "../../shared/schemas";
 import { Button } from "../components/button";
+import { Field, SelectInput, TextArea, TextInput } from "../components/field";
+import { deleteProject, getProject, updateProject } from "../lib/api";
 
 export function ProjectDetailPage() {
   const { projectId } = useParams();
-  const project = sampleProjects.find((item) => item.id === projectId) ?? sampleProjects[0];
+  const navigate = useNavigate();
+  const [project, setProject] = useState<Project | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (!projectId) {
+      return;
+    }
+
+    let isMounted = true;
+
+    getProject(projectId)
+      .then((response) => {
+        if (isMounted) {
+          setProject(response.project);
+          setError(null);
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setError("Project could not be loaded.");
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [projectId]);
+
+  async function handleSave(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!project) {
+      return;
+    }
+
+    setIsSaving(true);
+    setError(null);
+
+    const formData = new FormData(event.currentTarget);
+
+    try {
+      const response = await updateProject(project.id, {
+        title: String(formData.get("title") ?? ""),
+        status: String(formData.get("status") ?? project.status) as Project["status"],
+        yarnType: optionalString(formData.get("yarnType")),
+        yarnWeight: optionalString(formData.get("yarnWeight")),
+        colorsUsed: optionalString(formData.get("colorsUsed")),
+        hookSize: optionalString(formData.get("hookSize")),
+        finishedSize: optionalString(formData.get("finishedSize")),
+        notes: optionalString(formData.get("notes")),
+      });
+
+      setProject(response.project);
+      setIsEditing(false);
+    } catch {
+      setError("Project could not be updated.");
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  async function handleDelete() {
+    if (!project) {
+      return;
+    }
+
+    const confirmed = window.confirm(`Delete ${project.title}?`);
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await deleteProject(project.id);
+      navigate("/");
+    } catch {
+      setError("Project could not be deleted.");
+    }
+  }
+
+  if (error && !project) {
+    return (
+      <section className="rounded-lg border border-[var(--border)] bg-[var(--shell)] p-5">
+        <Link className="inline-flex items-center gap-2 text-sm text-[var(--muted)] hover:text-[var(--text)]" to="/">
+          <ArrowLeft size={16} />
+          Dashboard
+        </Link>
+        <p className="mt-4 text-sm text-[var(--muted)]">{error}</p>
+      </section>
+    );
+  }
+
+  if (!project) {
+    return (
+      <section className="rounded-lg border border-[var(--border)] bg-[var(--shell)] p-5 text-sm text-[var(--muted)]">
+        Loading project...
+      </section>
+    );
+  }
+
   const counters = sampleCounters.filter((counter) => counter.projectId === project.id);
   const sections = sampleSections.filter((section) => section.projectId === project.id);
 
@@ -23,12 +129,67 @@ export function ProjectDetailPage() {
               {project.status} · {project.hookSize ?? "Hook not set"} · {project.yarnType ?? "Yarn not set"}
             </p>
           </div>
-          <Button>
-            <Pencil size={17} />
-            Edit project
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={() => setIsEditing((value) => !value)}>
+              <Pencil size={17} />
+              {isEditing ? "Cancel edit" : "Edit project"}
+            </Button>
+            <Button onClick={handleDelete} variant="ghost">
+              <Trash2 size={17} />
+              Delete
+            </Button>
+          </div>
         </div>
       </header>
+
+      {error ? (
+        <div className="rounded-lg border border-[var(--border)] bg-[var(--surface-soft)] p-4 text-sm text-[var(--muted)]">
+          {error}
+        </div>
+      ) : null}
+
+      {isEditing ? (
+        <form className="rounded-lg border border-[var(--border)] bg-[var(--shell)] p-5" onSubmit={handleSave}>
+          <div className="grid gap-4 md:grid-cols-2">
+            <Field label="Project title">
+              <TextInput defaultValue={project.title} name="title" required />
+            </Field>
+            <Field label="Status">
+              <SelectInput defaultValue={project.status} name="status">
+                <option value="active">Active</option>
+                <option value="paused">Paused</option>
+                <option value="finished">Finished</option>
+                <option value="frogged">Frogged</option>
+              </SelectInput>
+            </Field>
+            <Field label="Yarn type">
+              <TextInput defaultValue={project.yarnType} name="yarnType" />
+            </Field>
+            <Field label="Yarn weight">
+              <TextInput defaultValue={project.yarnWeight} name="yarnWeight" />
+            </Field>
+            <Field label="Colors used">
+              <TextInput defaultValue={project.colorsUsed} name="colorsUsed" />
+            </Field>
+            <Field label="Hook size">
+              <TextInput defaultValue={project.hookSize} name="hookSize" />
+            </Field>
+            <Field label="Finished size">
+              <TextInput defaultValue={project.finishedSize} name="finishedSize" />
+            </Field>
+          </div>
+          <div className="mt-4">
+            <Field label="Notes">
+              <TextArea defaultValue={project.notes} name="notes" />
+            </Field>
+          </div>
+          <div className="mt-4 flex justify-end">
+            <Button disabled={isSaving} type="submit" variant="primary">
+              {isSaving ? "Saving..." : "Save changes"}
+            </Button>
+          </div>
+        </form>
+      ) : null}
 
       <div className="grid gap-4 lg:grid-cols-[22rem_1fr]">
         <aside className="space-y-4">
@@ -120,6 +281,11 @@ export function ProjectDetailPage() {
       </div>
     </section>
   );
+}
+
+function optionalString(value: FormDataEntryValue | null) {
+  const text = String(value ?? "").trim();
+  return text.length > 0 ? text : undefined;
 }
 
 function DetailRow({ label, value }: { label: string; value?: string }) {

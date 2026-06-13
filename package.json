@@ -9,9 +9,10 @@
     "dev:server": "PORT=6498 tsx watch src/server/index.ts",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 0.0.0.0 --port 6497",
-    "start": "PORT=6497 tsx src/server/index.ts",
+    "start": "tsx src/server/index.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -38,7 +39,8 @@
     "tailwindcss": "4.3.1",
     "tsx": "4.22.4",
     "typescript": "6.0.3",
-    "vite": "8.0.16"
+    "vite": "8.0.16",
+    "vitest": "latest"
   },
   "overrides": {
     "esbuild": "0.28.1"

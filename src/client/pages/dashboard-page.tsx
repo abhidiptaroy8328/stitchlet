@@ -1,10 +1,43 @@
 import { Grid2X2, List, Plus, Search } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { sampleCounters, sampleProjects } from "../../shared/sample-data";
+import { sampleCounters } from "../../shared/sample-data";
+import type { Project } from "../../shared/schemas";
 import { Button } from "../components/button";
 import { ProjectCard } from "../components/project-card";
+import { listProjects } from "../lib/api";
 
 export function DashboardPage() {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    listProjects()
+      .then((response) => {
+        if (isMounted) {
+          setProjects(response.projects);
+          setError(null);
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setError("Projects could not be loaded.");
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   return (
     <section className="space-y-6">
       <header className="rounded-lg border border-[var(--border)] bg-[var(--shell)] p-5">
@@ -56,8 +89,20 @@ export function DashboardPage() {
         </div>
       </header>
 
+      {error ? (
+        <div className="rounded-lg border border-[var(--border)] bg-[var(--surface-soft)] p-4 text-sm text-[var(--muted)]">
+          {error}
+        </div>
+      ) : null}
+
+      {isLoading ? (
+        <div className="rounded-lg border border-[var(--border)] bg-[var(--shell)] p-5 text-sm text-[var(--muted)]">
+          Loading projects...
+        </div>
+      ) : null}
+
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {sampleProjects.map((project) => (
+        {projects.map((project) => (
           <ProjectCard counters={sampleCounters} key={project.id} project={project} />
         ))}
         <Link

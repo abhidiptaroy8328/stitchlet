@@ -48,8 +48,10 @@ Current API routes:
 - `GET /api/projects`
 - `POST /api/projects`
 - `GET /api/projects/:id`
+- `PATCH /api/projects/:id`
+- `DELETE /api/projects/:id`
 
-These routes are scaffold routes. Project persistence still needs to be wired to SQLite.
+Project routes are backed by SQLite through Drizzle. The dashboard, create project page, and project detail page use these routes for project create, list, read, update, and delete behavior.
 
 ## Database
 
@@ -78,11 +80,9 @@ The app should not expose `uploads/` directly. Files should eventually be served
 
 ## Next Technical Steps
 
-1. Wire project CRUD to SQLite.
-2. Add migrations and database initialization.
-3. Add real create/edit/delete UI behavior.
-4. Add counter mutations.
-5. Add photo uploads.
-6. Add PDF upload, viewing, and download routes.
-7. Add Docker deployment files.
-8. Add PWA manifest and offline shell.
+1. Add counter mutations.
+2. Add photo uploads.
+3. Add PDF upload, viewing, and download routes.
+4. Add migration generation workflow around the current SQLite initializer.
+5. Add Docker deployment files.
+6. Add PWA manifest and offline shell.

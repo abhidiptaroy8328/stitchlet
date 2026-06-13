@@ -34,3 +34,23 @@ What was rejected and why:
 
 - Fake cloud or sync features were rejected because Stitchlet is explicitly self-hosted and local-first.
 - Decorative craft-heavy styling was rejected because the target UI is minimal, sleek, and professional.
+
+## 2026-06-13
+
+### Decision: Make project CRUD SQLite-backed before counters/uploads
+
+What was decided:
+
+- Replace sample project reads with real Hono API routes backed by SQLite through Drizzle.
+- Wire dashboard, create project, and project detail flows to the API for project create, list, read, update, and delete behavior.
+- Keep counters, custom sections, photos, PDFs, auth, Docker, and PWA work out of this slice.
+
+Why:
+
+- Real project persistence gives Stitchlet a useful foundation before adding more feature layers.
+- The app can now store core project metadata locally without pretending uploads or counters are complete.
+
+What was rejected and why:
+
+- A full migration framework was rejected for this slice because a small SQLite initializer is simpler while the schema is still early.
+- Seeding sample projects into the real database was rejected because the self-hosted app should start clean and private by default.

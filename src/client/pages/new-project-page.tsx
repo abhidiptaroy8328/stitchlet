@@ -1,9 +1,41 @@
 import { ArrowLeft, Save } from "lucide-react";
-import { Link } from "react-router-dom";
+import { type FormEvent, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../components/button";
 import { Field, SelectInput, TextArea, TextInput } from "../components/field";
+import { createProject } from "../lib/api";
 
 export function NewProjectPage() {
+  const navigate = useNavigate();
+  const [error, setError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setIsSaving(true);
+    setError(null);
+
+    const formData = new FormData(event.currentTarget);
+    const payload = {
+      title: String(formData.get("title") ?? ""),
+      status: String(formData.get("status") ?? "active") as "active" | "paused" | "finished" | "frogged",
+      yarnType: optionalString(formData.get("yarnType")),
+      yarnWeight: optionalString(formData.get("yarnWeight")),
+      colorsUsed: optionalString(formData.get("colorsUsed")),
+      hookSize: optionalString(formData.get("hookSize")),
+      finishedSize: optionalString(formData.get("finishedSize")),
+      notes: optionalString(formData.get("notes")),
+    };
+
+    try {
+      const response = await createProject(payload);
+      navigate(`/projects/${response.project.id}`);
+    } catch {
+      setError("Project could not be saved.");
+      setIsSaving(false);
+    }
+  }
+
   return (
     <section className="space-y-6">
       <header className="flex flex-col gap-4 rounded-lg border border-[var(--border)] bg-[var(--shell)] p-5 md:flex-row md:items-center md:justify-between">
@@ -14,23 +46,29 @@ export function NewProjectPage() {
           </Link>
           <h1 className="mt-3 text-3xl font-semibold">Create project</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">
-            This scaffold captures the fields from the plan. Saving to SQLite comes next.
+            Save the core project details to your local Stitchlet database.
           </p>
         </div>
-        <Button variant="primary">
+        <Button disabled={isSaving} form="new-project-form" type="submit" variant="primary">
           <Save size={17} />
-          Save draft
+          {isSaving ? "Saving..." : "Save project"}
         </Button>
       </header>
 
-      <form className="grid gap-4 lg:grid-cols-[1fr_20rem]">
+      {error ? (
+        <div className="rounded-lg border border-[var(--border)] bg-[var(--surface-soft)] p-4 text-sm text-[var(--muted)]">
+          {error}
+        </div>
+      ) : null}
+
+      <form className="grid gap-4 lg:grid-cols-[1fr_20rem]" id="new-project-form" onSubmit={handleSubmit}>
         <div className="space-y-4 rounded-lg border border-[var(--border)] bg-[var(--shell)] p-5">
           <div className="grid gap-4 md:grid-cols-2">
             <Field label="Project title">
-              <TextInput placeholder="Strawberry Bunny" />
+              <TextInput name="title" placeholder="Strawberry Bunny" required />
             </Field>
             <Field label="Status">
-              <SelectInput defaultValue="active">
+              <SelectInput defaultValue="active" name="status">
                 <option value="active">Active</option>
                 <option value="paused">Paused</option>
                 <option value="finished">Finished</option>
@@ -38,23 +76,23 @@ export function NewProjectPage() {
               </SelectInput>
             </Field>
             <Field label="Yarn type">
-              <TextInput placeholder="Premier Parfait Chunky" />
+              <TextInput name="yarnType" placeholder="Premier Parfait Chunky" />
             </Field>
             <Field label="Yarn weight">
-              <TextInput placeholder="6 super bulky" />
+              <TextInput name="yarnWeight" placeholder="6 super bulky" />
             </Field>
             <Field label="Colors used">
-              <TextInput placeholder="pink, cream, green" />
+              <TextInput name="colorsUsed" placeholder="pink, cream, green" />
             </Field>
             <Field label="Hook size">
-              <TextInput placeholder="4.0mm" />
+              <TextInput name="hookSize" placeholder="4.0mm" />
             </Field>
             <Field label="Finished size">
-              <TextInput placeholder="10 inches" />
+              <TextInput name="finishedSize" placeholder="10 inches" />
             </Field>
           </div>
           <Field label="Notes">
-            <TextArea placeholder="Pattern changes, sizing notes, gift details, or anything useful." />
+            <TextArea name="notes" placeholder="Pattern changes, sizing notes, gift details, or anything useful." />
           </Field>
         </div>
 
@@ -77,4 +115,9 @@ export function NewProjectPage() {
       </form>
     </section>
   );
+}
+
+function optionalString(value: FormDataEntryValue | null) {
+  const text = String(value ?? "").trim();
+  return text.length > 0 ? text : undefined;
 }

@@ -72,11 +72,11 @@ Implemented:
 - Settings route
 - Shared project/counter/custom section schemas
 - Drizzle SQLite schema
-- Hono API skeleton
+- Hono API
+- SQLite-backed project create, list, read, update, and delete behavior
 
 Not implemented yet:
 
-- Real SQLite-backed CRUD
 - Photo uploads
 - PDF uploads/viewing/downloads
 - Counter mutations
