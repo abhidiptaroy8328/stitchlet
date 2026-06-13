@@ -1,7 +1,7 @@
-FROM node:22-alpine
+FROM node:22-slim
 
 # Install zip and unzip for settings backup/restore
-RUN apk add --no-cache zip unzip
+RUN apt-get update && apt-get install -y --no-install-recommends zip unzip && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 

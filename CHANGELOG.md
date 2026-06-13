@@ -2,6 +2,7 @@
 
 ## 2026-06-13
 
+- Fixed Docker build: switched base image from `node:22-alpine` (musl libc) to `node:22-slim` (glibc/Debian) to resolve `better-sqlite3` native module loading failure (`ERR_DLOPEN_FAILED: ld-linux-x86-64.so.2 not found`).
 - Added app previews and screenshots to `README.md`.
 - Refactored `README.md` as user-facing GitHub documentation and created `README_DOCKER.md` for Docker Hub listings.
 - Added multi-stage production Dockerfile and Docker Compose configurations supporting persistent bind mounts for app data, uploaded files, and backups.
