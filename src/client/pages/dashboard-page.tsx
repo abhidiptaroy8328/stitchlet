@@ -51,10 +51,7 @@ export function DashboardPage() {
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-sm text-(--muted)">Dashboard</p>
-            <h1 className="mt-2 text-3xl font-semibold tracking-normal">Your crochet projects</h1>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-(--muted)">
-              Keep patterns, counters, materials, photos, and notes organized on your own server.
-            </p>
+            <h1 className="mt-2 text-3xl font-semibold tracking-normal">Crochet projects</h1>
           </div>
           <Link to="/projects/new">
             <Button variant="primary">

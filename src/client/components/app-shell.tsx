@@ -14,11 +14,10 @@ export function AppShell() {
       <div className="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_1px_1px,var(--dot)_1px,transparent_0)] [bg-size:28px_28px]" />
       <div className="mx-auto flex min-h-screen w-full max-w-[1800px] flex-col px-4 py-4 lg:flex-row lg:gap-6 lg:px-6 xl:px-8">
         <aside className="mb-4 flex items-center justify-between rounded-lg border border-(--border) bg-(--shell) p-3 lg:sticky lg:top-6 lg:mb-0 lg:h-[calc(100vh-3rem)] lg:w-64 lg:flex-col lg:items-stretch lg:justify-start">
-          <div className="flex items-center gap-3">
-            <img alt="" className="h-11 w-11 rounded-md object-cover" src="/logo.png" />
+          <div className="flex items-center gap-3 px-4">
+            <img alt="" className="h-12 w-12 rounded-md object-cover" src="/logo.png" />
             <div>
-              <p className="text-base font-semibold leading-tight">Stitchlet</p>
-              <p className="text-xs text-(--muted)">Self-hosted</p>
+              <p className="text-2xl font-semibold leading-tight">Stitchlet</p>
             </div>
           </div>
 
@@ -26,7 +25,7 @@ export function AppShell() {
             {navItems.map((item) => (
               <NavLink
                 className={({ isActive }) =>
-                  `flex items-center gap-3 rounded-md px-3 py-2 text-sm transition ${
+                  `flex items-center gap-3 rounded-md px-3 py-2 text-md transition ${
                     isActive
                       ? "bg-(--surface-strong) text-(--text)"
                       : "text-(--muted) hover:bg-(--surface) hover:text-(--text)"
@@ -51,7 +50,6 @@ export function AppShell() {
                 PDFs, photos, counters, and notes stay on your own server.
               </p>
             </div>
-            <ThemeToggle />
           </div>
         </aside>
 

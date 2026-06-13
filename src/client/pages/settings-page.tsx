@@ -37,7 +37,7 @@ export function SettingsPage() {
               <SunMoon className="text-(--accent-purple)" size={20} />
               <div>
                 <p className="font-medium">Theme</p>
-                <p className="mt-1 text-sm text-(--muted)">Default dark mode with a light cream option.</p>
+                <p className="mt-1 text-sm text-(--muted)">Dark/Light Mode</p>
               </div>
             </div>
             <ThemeToggle />
