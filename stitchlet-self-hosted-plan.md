@@ -2,6 +2,12 @@
 
 A self-hosted crochet companion app for people who want to run their own private crochet project server, store their own PDFs/photos locally, and access the app from desktop or mobile without cloud storage.
 
+### UI Notes
+
+**Themes:** Dark/light mode toggle. Default dark mode. 
+**Dark mode:** Background: Dark Gray #121212, Accent Colors: Pink #FC9EB1 Purple, #D09CDE
+**Light mode:** Background: Cream #FEF4E8, Accent Colors: Pink #F27593, Purple #9058A4
+
 ## 1. App summary
 
 Stitchlet is a simple self-hosted crochet project companion.
@@ -192,13 +198,13 @@ Uploads folder in ./uploads
 Access locally:
 
 ```txt
-http://localhost:3000
+http://localhost:6497
 ```
 
 Access from phone on same Wi-Fi:
 
 ```txt
-http://192.168.1.x:3000
+http://192.168.1.x:6497
 ```
 
 ### Production/self-hosted setup
@@ -214,19 +220,19 @@ Uploads mounted as persistent files
 Access at home:
 
 ```txt
-http://nas-ip:3000
+http://nas-ip:6497
 ```
 
 Example:
 
 ```txt
-http://192.168.1.50:3000
+http://192.168.1.50:6497
 ```
 
 Optional nicer local hostname:
 
 ```txt
-http://stitchlet.local:3000
+http://stitchlet.local:6497
 ```
 
 ## 8. Computer vs NAS
@@ -318,7 +324,7 @@ NAS or computer running Stitchlet
 Access:
 
 ```txt
-http://192.168.1.50:3000
+http://192.168.1.50:6497
 ```
 
 Good for:
@@ -873,7 +879,7 @@ services:
     build: .
     container_name: stitchlet
     ports:
-      - "3000:3000"
+      - "6497:6497"
     volumes:
       - ./data:/app/data
       - ./uploads:/app/uploads
@@ -913,7 +919,7 @@ Optional:
 ```txt
 ENABLE_AUTH=true
 ALLOW_REGISTRATION=false
-APP_BASE_URL=http://localhost:3000
+APP_BASE_URL=http://localhost:6497
 ```
 
 ## 21. Backups
@@ -1275,7 +1281,7 @@ docker compose up -d
 Then open:
 
 ```txt
-http://localhost:3000
+http://localhost:6497
 ```
 
 ### NAS users
