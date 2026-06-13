@@ -1,9 +1,8 @@
-import { FileText, TimerReset } from "lucide-react";
+import { FileText } from "lucide-react";
 import { Link } from "react-router-dom";
-import type { Counter, Project } from "../../shared/schemas";
+import type { Project } from "../../shared/schemas";
 
 type ProjectCardProps = {
-  counters: Counter[];
   project: Project;
 };
 
@@ -14,20 +13,25 @@ const statusLabels: Record<Project["status"], string> = {
   frogged: "Frogged",
 };
 
-export function ProjectCard({ counters, project }: ProjectCardProps) {
-  const activeCounter = counters.find((counter) => counter.projectId === project.id);
-
+export function ProjectCard({ project }: ProjectCardProps) {
   return (
     <Link
       className="group block rounded-lg border border-(--border) bg-(--surface) p-3 transition hover:-translate-y-0.5 hover:border-(--accent-pink) hover:bg-(--surface-strong)"
       to={`/projects/${project.id}`}
     >
-      <div className="aspect-4/3 rounded-md border border-(--border) bg-(--surface-strong) p-3">
-        <div className="flex h-full items-end justify-between">
-          <div className="rounded-md bg-(--chip) px-2 py-1 text-xs font-medium text-(--text)">
+      <div className="relative aspect-4/3 overflow-hidden rounded-md border border-(--border) bg-(--surface-strong)">
+        {project.photoPath ? (
+          <img
+            alt={project.title}
+            className="h-full w-full object-cover"
+            src={`/api/projects/${project.id}/photo`}
+          />
+        ) : null}
+        <div className="absolute inset-0 flex items-end justify-between p-3">
+          <div className="rounded-md bg-(--chip) px-2 py-1 text-xs font-medium text-(--text)" style={{ backdropFilter: "blur(4px)" }}>
             {statusLabels[project.status]}
           </div>
-          {project.pdfFilename ? <FileText className="text-(--accent-purple)" size={20} /> : null}
+          {project.pdfFilename ? <FileText className="text-(--accent-purple) drop-shadow" size={20} /> : null}
         </div>
       </div>
       <div className="mt-4">
@@ -47,16 +51,6 @@ export function ProjectCard({ counters, project }: ProjectCardProps) {
             <dd className="mt-1 truncate font-medium">{project.yarnWeight ?? project.yarnType ?? "Not set"}</dd>
           </div>
         </dl>
-        {activeCounter ? (
-          <div className="mt-4 flex items-center gap-2 rounded-md border border-(--border) bg-(--shell) px-3 py-2 text-sm">
-            <TimerReset size={16} className="text-(--accent-pink)" />
-            <span className="text-(--muted)">{activeCounter.name}</span>
-            <span className="ml-auto font-semibold">
-              {activeCounter.currentValue}
-              {activeCounter.targetValue ? ` / ${activeCounter.targetValue}` : ""}
-            </span>
-          </div>
-        ) : null}
       </div>
     </Link>
   );

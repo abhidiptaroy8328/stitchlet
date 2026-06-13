@@ -6,7 +6,7 @@
 
 Stitchlet is a self-hosted crochet companion for organizing projects, PDFs, counters, photos, materials, and notes on your own server.
 
-This repository currently contains the Phase 1 scaffold: a Vite React app, Hono API skeleton, SQLite/Drizzle schema, shared validation types, and a polished minimal UI shell.
+The core project CRUD, counters, project photos, and custom material entries are all working and backed by SQLite. PDF viewing is the next piece.
 
 ## Stack
 
@@ -65,22 +65,24 @@ src/
 
 Implemented:
 
-- Minimal dark/light app shell
-- Dashboard route
+- Minimal dark/light app shell with dotted grid background
+- Dashboard route with live project data
 - Create project route
 - Project detail route
 - Settings route
 - Shared project/counter/custom section schemas
 - Drizzle SQLite schema
 - Hono API
-- SQLite-backed project create, list, read, update, and delete behavior
-- SQLite-backed counter create, list, update, and delete behavior
+- SQLite-backed project create, list, read, update, and delete
+- SQLite-backed counter create, list, update, and delete (with increment, decrement, reset, complete)
+- Project photo upload, replace, remove — stored locally, served via API
+- Project photo thumbnails on dashboard cards (grid and list view)
+- Dashboard list/grid view toggle
+- Custom material entries (add/remove) — stored in `custom_sections` table
+- PDF upload, inline viewer (iframe modal), and download — stored locally, served via API
 
 Not implemented yet:
 
-- Photo uploads
-- PDF uploads/viewing/downloads
-- Custom section mutations
 - Auth
 - Docker deployment
 - PWA install/offline behavior

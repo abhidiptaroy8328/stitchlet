@@ -112,3 +112,49 @@ What was rejected and why:
 
 - Sharp/image processing was deferred — square crop is CSS for now, server-side resize is a future slice.
 - Serving photos as static files directly was rejected because API routing handles auth, NAS portability, and future signed URL support better.
+
+### Bug logged: Nested HTML forms silently fail
+
+What happened:
+
+- The add-material UI was implemented as a `<form>` nested inside the edit project `<form>`.
+- HTML forbids nested forms. The browser ignores the inner form and submits the outer one on any submit event inside it.
+- The result was that clicking Add caused the edit form to save and close, with no error shown anywhere.
+
+What worked instead:
+
+- Replace the inner form with a plain `<div>`.
+- Drive the inputs via controlled React state (`value` + `onChange`).
+- Handle the Add button with a direct `type="button"` click handler.
+
+Note for next time:
+
+- Any time there is a form inside another form in this app, this will silently break. Always use controlled state + click handlers for nested actions inside an existing form element.
+
+### Session end: 2026-06-13
+
+Worked on:
+
+- Project photo upload (backend + UI): upload, replace, remove; square display via CSS.
+- Custom material entries: add/remove backed by `custom_sections` table; moved controls into edit project form.
+- Fixed nested form bug causing silent failure on material add.
+- Replaced deprecated `FormEvent` with `SyntheticEvent<HTMLFormElement>`.
+
+Completed:
+
+- Phase 4 (photos) fully implemented on detail page.
+- Custom material add/remove working end-to-end.
+- All form event types updated for React 19 / TypeScript 6.
+
+In progress: nothing.
+
+Decisions made:
+
+- Custom material controls live in the edit form, not the view-mode panel. Keeps view-only panel read-only, consistent with other material fields.
+- No server-side image processing for now. Square crop is CSS only.
+
+Next session priorities:
+
+1. PDF upload route (POST `/api/projects/:id/pdf`), serve route (GET), and download route.
+2. In-app PDF viewer (likely `<iframe>` or `<embed>` pointing at the serve route).
+3. Dashboard card photo thumbnails.

@@ -38,23 +38,30 @@ Status: implemented for basic counter records. Duplicate and reorder can come la
 
 - Upload project photo
 - Replace project photo
-- Show thumbnails on dashboard
-- Show project photo on detail page
+- Remove project photo
+- Show photo on detail page
+- Show thumbnails on dashboard cards (grid + list view)
+
+Status: implemented.
 
 ## Phase 5: PDFs
 
 - Upload pattern PDF
 - Replace PDF
-- View PDF in app
+- View PDF in app (iframe modal)
 - Download PDF
 - Delete PDF
 
-## Phase 6: Custom Sections and Notes
+Status: implemented.
 
-- Add custom sections
-- Edit custom sections
-- Delete custom sections
-- Reorder custom sections
+## Phase 6: Custom Materials
+
+- Add custom material entries to the Materials panel
+- Remove custom material entries
+- Edit existing entries (deferred)
+- Reorder entries (deferred)
+
+Status: add and remove implemented. Entries persist to the `custom_sections` table.
 
 ## Phase 7: Self-Hosted Deployment
 

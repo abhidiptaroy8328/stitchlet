@@ -50,12 +50,23 @@ Current API routes:
 - `GET /api/projects/:id`
 - `PATCH /api/projects/:id`
 - `DELETE /api/projects/:id`
+- `POST /api/projects/:id/photo` — upload project photo
+- `GET /api/projects/:id/photo` — serve project photo
+- `DELETE /api/projects/:id/photo` — remove project photo
 - `GET /api/projects/:id/counters`
 - `POST /api/projects/:id/counters`
 - `PATCH /api/counters/:id`
 - `DELETE /api/counters/:id`
+- `GET /api/projects/:id/sections`
+- `POST /api/projects/:id/sections`
+- `PATCH /api/sections/:id`
+- `DELETE /api/sections/:id`
+- `GET /api/projects/:id/pdf` — serve PDF inline (for iframe viewer)
+- `GET /api/projects/:id/pdf/download` — serve PDF as attachment
+- `POST /api/projects/:id/pdf` — upload PDF
+- `DELETE /api/projects/:id/pdf` — remove PDF
 
-Project and counter routes are backed by SQLite through Drizzle. The dashboard, create project page, and project detail page use these routes for project create, list, read, update, and delete behavior. Project detail also uses the counter API for add, increment, decrement, reset, complete, and delete controls.
+Project, counter, photo, and section routes are all backed by SQLite through Drizzle. The dashboard, create project page, and project detail page use these routes for live data. Project detail supports add/increment/decrement/reset/complete/delete for counters, add/remove for custom material sections, and upload/replace/remove for the project photo.
 
 ## Database
 
@@ -77,16 +88,14 @@ Default database path:
 Persistent local folders:
 
 - `data/`: SQLite database
-- `uploads/`: future PDFs and photos
+- `uploads/projects/<id>/`: project photos (served via API, not exposed directly)
 - `backups/`: future backup exports
 
-The app should not expose `uploads/` directly. Files should eventually be served through authenticated API routes.
+Photos are saved to the local filesystem and served through `/api/projects/:id/photo`. Files are not exposed via static file serving — all access goes through the API server.
 
 ## Next Technical Steps
 
-1. Add photo uploads.
-2. Add PDF upload, viewing, and download routes.
-3. Add custom section mutations.
-4. Add migration generation workflow around the current SQLite initializer.
-5. Add Docker deployment files.
-6. Add PWA manifest and offline shell.
+1. Show project photo thumbnails on dashboard cards. ✅
+2. Add migration generation workflow around the current SQLite initializer.
+3. Add Docker deployment files.
+4. Add PWA manifest and offline shell.

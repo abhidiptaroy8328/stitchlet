@@ -149,6 +149,33 @@ export async function deleteProjectPhoto(projectId: string) {
   }
 }
 
+export async function uploadProjectPdf(projectId: string, file: File) {
+  const formData = new FormData();
+  formData.append("pdf", file);
+
+  const response = await fetch(`/api/projects/${projectId}/pdf`, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const message = await response.text();
+    throw new Error(message || "PDF upload failed.");
+  }
+
+  return response.json() as Promise<ProjectResponse>;
+}
+
+export async function deleteProjectPdf(projectId: string) {
+  const response = await fetch(`/api/projects/${projectId}/pdf`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    throw new Error("PDF could not be deleted.");
+  }
+}
+
 async function request<T>(path: string, init?: RequestInit) {
   const response = await fetch(path, {
     ...init,

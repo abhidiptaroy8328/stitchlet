@@ -160,6 +160,113 @@ export function createProjectRoutes({ db }: Required<AppDependencies>) {
     return c.body(null, 204);
   });
 
+  // PDF: upload
+  projectRoutes.post("/:id/pdf", async (c) => {
+    const project = await projects.findById(c.req.param("id"));
+
+    if (!project) {
+      return c.json({ error: "Project not found" }, 404);
+    }
+
+    const formData = await c.req.parseBody();
+    const file = formData["pdf"];
+
+    if (!file || typeof file === "string") {
+      return c.json({ error: "No PDF file provided" }, 400);
+    }
+
+    if (file.type !== "application/pdf") {
+      return c.json({ error: "Only PDF files are supported." }, 400);
+    }
+
+    const projectDir = join(uploadsRoot, "projects", project.id);
+    await mkdir(projectDir, { recursive: true });
+
+    // Remove any existing PDF
+    const existing = ["pattern.pdf"];
+    for (const old of existing) {
+      const oldPath = join(projectDir, old);
+      if (existsSync(oldPath)) {
+        await rm(oldPath);
+      }
+    }
+
+    const buffer = await file.arrayBuffer();
+    await writeFile(join(projectDir, "pattern.pdf"), Buffer.from(buffer));
+
+    const relativePath = `projects/${project.id}/pattern.pdf`;
+    const originalName = file.name || "pattern.pdf";
+    const updated = await projects.updatePdfPath(project.id, relativePath, originalName);
+
+    return c.json({ project: updated }, 200);
+  });
+
+  // PDF: serve inline (for in-app viewer)
+  projectRoutes.get("/:id/pdf", async (c) => {
+    const project = await projects.findById(c.req.param("id"));
+
+    if (!project || !project.pdfPath) {
+      return c.json({ error: "No PDF found" }, 404);
+    }
+
+    const filePath = join(uploadsRoot, project.pdfPath);
+
+    if (!existsSync(filePath)) {
+      return c.json({ error: "PDF file missing" }, 404);
+    }
+
+    const stream = createReadStream(filePath);
+    return new Response(stream as unknown as ReadableStream, {
+      headers: {
+        "content-type": "application/pdf",
+        "content-disposition": "inline",
+      },
+    });
+  });
+
+  // PDF: download (triggers browser save dialog)
+  projectRoutes.get("/:id/pdf/download", async (c) => {
+    const project = await projects.findById(c.req.param("id"));
+
+    if (!project || !project.pdfPath) {
+      return c.json({ error: "No PDF found" }, 404);
+    }
+
+    const filePath = join(uploadsRoot, project.pdfPath);
+
+    if (!existsSync(filePath)) {
+      return c.json({ error: "PDF file missing" }, 404);
+    }
+
+    const filename = project.pdfFilename ?? "pattern.pdf";
+    const stream = createReadStream(filePath);
+    return new Response(stream as unknown as ReadableStream, {
+      headers: {
+        "content-type": "application/pdf",
+        "content-disposition": `attachment; filename="${filename}"`,
+      },
+    });
+  });
+
+  // PDF: delete
+  projectRoutes.delete("/:id/pdf", async (c) => {
+    const project = await projects.findById(c.req.param("id"));
+
+    if (!project) {
+      return c.json({ error: "Project not found" }, 404);
+    }
+
+    if (project.pdfPath) {
+      const filePath = join(uploadsRoot, project.pdfPath);
+      if (existsSync(filePath)) {
+        await rm(filePath);
+      }
+      await projects.updatePdfPath(project.id, null, null);
+    }
+
+    return c.body(null, 204);
+  });
+
   projectRoutes.route("/:id/counters", createProjectCounterRoutes({ db }));
   projectRoutes.route("/:id/sections", createProjectSectionRoutes({ db }));
 

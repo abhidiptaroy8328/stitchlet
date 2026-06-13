@@ -1,16 +1,23 @@
-import { Grid2X2, List, Plus, Search } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ChevronRight, FileText, Grid2X2, List, Plus, Search, TimerReset } from "lucide-react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { sampleCounters } from "../../shared/sample-data";
 import type { Project } from "../../shared/schemas";
 import { Button } from "../components/button";
 import { ProjectCard } from "../components/project-card";
 import { listProjects } from "../lib/api";
 
+const statusLabels: Record<Project["status"], string> = {
+  active: "Active",
+  paused: "Paused",
+  finished: "Finished",
+  frogged: "Frogged",
+};
+
 export function DashboardPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   useEffect(() => {
     let isMounted = true;
@@ -79,10 +86,20 @@ export function DashboardPage() {
             <option>Status</option>
           </select>
           <div className="grid h-11 grid-cols-2 rounded-md border border-(--border) bg-(--surface) p-1">
-            <button className="inline-flex items-center justify-center rounded text-(--text)" type="button" title="Grid view">
+            <button
+              className={`inline-flex items-center justify-center rounded transition ${viewMode === "grid" ? "bg-(--surface-strong) text-(--text)" : "text-(--muted) hover:text-(--text)"}`}
+              onClick={() => setViewMode("grid")}
+              title="Grid view"
+              type="button"
+            >
               <Grid2X2 size={17} />
             </button>
-            <button className="inline-flex items-center justify-center rounded text-(--muted) hover:text-(--text)" type="button" title="List view">
+            <button
+              className={`inline-flex items-center justify-center rounded transition ${viewMode === "list" ? "bg-(--surface-strong) text-(--text)" : "text-(--muted) hover:text-(--text)"}`}
+              onClick={() => setViewMode("list")}
+              title="List view"
+              type="button"
+            >
               <List size={17} />
             </button>
           </div>
@@ -101,23 +118,81 @@ export function DashboardPage() {
         </div>
       ) : null}
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {projects.map((project) => (
-          <ProjectCard counters={sampleCounters} key={project.id} project={project} />
-        ))}
-        <Link
-          className="flex min-h-80 flex-col items-center justify-center rounded-lg border border-dashed border-(--border) bg-(--surface-soft) p-6 text-center transition hover:border-(--accent-purple)"
-          to="/projects/new"
-        >
-          <div className="flex h-11 w-11 items-center justify-center rounded-md bg-(--chip) text-(--accent-pink)">
-            <Plus size={22} />
-          </div>
-          <h2 className="mt-4 text-base font-semibold">Start a new project</h2>
-          <p className="mt-2 max-w-64 text-sm leading-6 text-(--muted)">
-            Add the pattern, yarn, hook size, and notes you need before the first row.
-          </p>
-        </Link>
-      </div>
+      {viewMode === "grid" ? (
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {projects.map((project) => (
+            <ProjectCard key={project.id} project={project} />
+          ))}
+          <Link
+            className="flex min-h-80 flex-col items-center justify-center rounded-lg border border-dashed border-(--border) bg-(--surface-soft) p-6 text-center transition hover:border-(--accent-purple)"
+            to="/projects/new"
+          >
+            <div className="flex h-11 w-11 items-center justify-center rounded-md bg-(--chip) text-(--accent-pink)">
+              <Plus size={22} />
+            </div>
+            <h2 className="mt-4 text-base font-semibold">Start a new project</h2>
+            <p className="mt-2 max-w-64 text-sm leading-6 text-(--muted)">
+              Add the pattern, yarn, hook size, and notes you need before the first row.
+            </p>
+          </Link>
+        </div>
+      ) : (
+        <div className="rounded-lg border border-(--border) bg-(--shell) overflow-hidden">
+          {projects.length === 0 ? (
+            <p className="p-5 text-sm text-(--muted)">No projects yet.</p>
+          ) : null}
+          {projects.map((project, i) => (
+            <Link
+              className={`flex items-center gap-4 px-5 py-4 transition hover:bg-(--surface) ${i > 0 ? "border-t border-(--border)" : ""}`}
+              key={project.id}
+              to={`/projects/${project.id}`}
+            >
+              {/* Thumbnail */}
+              <div className="h-12 w-12 shrink-0 overflow-hidden rounded-md border border-(--border) bg-(--surface-strong)">
+                {project.photoPath ? (
+                  <img
+                    alt={project.title}
+                    className="h-full w-full object-cover"
+                    src={`/api/projects/${project.id}/photo`}
+                  />
+                ) : null}
+              </div>
+
+              {/* Title + meta */}
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-medium">{project.title}</p>
+                <p className="mt-0.5 text-xs text-(--muted)">
+                  {project.hookSize ?? "—"} · {project.yarnType ?? "—"}
+                </p>
+              </div>
+
+              {/* Status chip */}
+              <span className="shrink-0 rounded-md bg-(--chip) px-2 py-1 text-xs font-medium text-(--text)">
+                {statusLabels[project.status]}
+              </span>
+
+              {/* PDF indicator */}
+              {project.pdfFilename ? (
+                <FileText className="shrink-0 text-(--accent-purple)" size={16} />
+              ) : null}
+
+              {/* Counter indicator */}
+              <TimerReset className="shrink-0 text-(--accent-pink)" size={16} />
+
+              <ChevronRight className="shrink-0 text-(--muted)" size={16} />
+            </Link>
+          ))}
+          <Link
+            className="flex items-center gap-3 border-t border-(--border) px-5 py-4 text-sm text-(--muted) transition hover:bg-(--surface) hover:text-(--text)"
+            to="/projects/new"
+          >
+            <div className="flex h-8 w-8 items-center justify-center rounded-md border border-dashed border-(--border)">
+              <Plus size={15} />
+            </div>
+            New project
+          </Link>
+        </div>
+      )}
     </section>
   );
 }

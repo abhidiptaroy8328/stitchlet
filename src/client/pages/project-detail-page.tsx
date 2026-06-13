@@ -21,6 +21,7 @@ import {
   createSection,
   deleteCounter,
   deleteProject,
+  deleteProjectPdf,
   deleteProjectPhoto,
   deleteSection,
   getProject,
@@ -28,6 +29,7 @@ import {
   listSections,
   updateCounter,
   updateProject,
+  uploadProjectPdf,
   uploadProjectPhoto,
 } from "../lib/api";
 
@@ -39,6 +41,8 @@ export function ProjectDetailPage() {
   const [counterError, setCounterError] = useState<string | null>(null);
   const [sectionError, setSectionError] = useState<string | null>(null);
   const [photoError, setPhotoError] = useState<string | null>(null);
+  const [pdfError, setPdfError] = useState<string | null>(null);
+  const [isPdfViewerOpen, setIsPdfViewerOpen] = useState(false);
   const [counters, setCounters] = useState<Counter[]>([]);
   const [sections, setSections] = useState<CustomSection[]>([]);
   const [isEditing, setIsEditing] = useState(false);
@@ -48,7 +52,9 @@ export function ProjectDetailPage() {
   const [materialValue, setMaterialValue] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const [isUploadingPdf, setIsUploadingPdf] = useState(false);
   const photoInputRef = useRef<HTMLInputElement>(null);
+  const pdfInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!projectId) {
@@ -286,6 +292,38 @@ export function ProjectDetailPage() {
       setPhotoError(null);
     } catch {
       setPhotoError("Photo could not be removed.");
+    }
+  }
+
+  async function handlePdfChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file || !project) return;
+
+    setIsUploadingPdf(true);
+    setPdfError(null);
+
+    try {
+      const response = await uploadProjectPdf(project.id, file);
+      setProject(response.project);
+    } catch {
+      setPdfError("PDF could not be uploaded.");
+    } finally {
+      setIsUploadingPdf(false);
+      if (pdfInputRef.current) {
+        pdfInputRef.current.value = "";
+      }
+    }
+  }
+
+  async function handleDeletePdf() {
+    if (!project) return;
+
+    try {
+      await deleteProjectPdf(project.id);
+      setProject((prev) => (prev ? { ...prev, pdfPath: undefined, pdfFilename: undefined } : prev));
+      setPdfError(null);
+    } catch {
+      setPdfError("PDF could not be removed.");
     }
   }
 
@@ -528,22 +566,51 @@ export function ProjectDetailPage() {
 
         <div className="space-y-4">
           <section className="rounded-lg border border-(--border) bg-(--shell) p-5">
-            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-              <div>
-                <h2 className="text-base font-semibold">Pattern</h2>
-                <p className="mt-1 text-sm text-(--muted)">{project.pdfFilename ?? "No PDF attached yet."}</p>
+            {project.pdfPath ? (
+              <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <div className="min-w-0">
+                  <h2 className="text-base font-semibold">Pattern</h2>
+                  <p className="mt-1 truncate text-sm text-(--muted)">{project.pdfFilename}</p>
+                </div>
+                <div className="flex shrink-0 gap-2">
+                  <Button onClick={() => setIsPdfViewerOpen(true)}>
+                    <FileText size={17} />
+                    View PDF
+                  </Button>
+                  <a
+                    className="inline-flex h-10 items-center gap-2 rounded-lg border border-(--border) bg-(--surface) px-4 text-sm font-medium text-(--muted) transition hover:text-(--text)"
+                    download={project.pdfFilename}
+                    href={`/api/projects/${project.id}/pdf/download`}
+                  >
+                    <Download size={17} />
+                    Download
+                  </a>
+                  <Button onClick={handleDeletePdf} variant="ghost">
+                    <Trash2 size={17} />
+                    Remove
+                  </Button>
+                </div>
               </div>
-              <div className="flex gap-2">
-                <Button>
-                  <FileText size={17} />
-                  View PDF
-                </Button>
-                <Button variant="ghost">
-                  <Download size={17} />
-                  Download
+            ) : (
+              <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <div>
+                  <h2 className="text-base font-semibold">Pattern</h2>
+                  <p className="mt-1 text-sm text-(--muted)">No PDF attached yet.</p>
+                </div>
+                <Button disabled={isUploadingPdf} onClick={() => pdfInputRef.current?.click()}>
+                  <Upload size={17} />
+                  {isUploadingPdf ? "Uploading..." : "Upload PDF"}
                 </Button>
               </div>
-            </div>
+            )}
+            <input
+              accept="application/pdf"
+              className="hidden"
+              onChange={handlePdfChange}
+              ref={pdfInputRef}
+              type="file"
+            />
+            {pdfError ? <p className="mt-2 text-xs text-(--muted)">{pdfError}</p> : null}
           </section>
 
           <section className="rounded-lg border border-(--border) bg-(--shell) p-5">
@@ -663,6 +730,40 @@ export function ProjectDetailPage() {
           </section>
         </div>
       </div>
+      {/* PDF viewer modal */}
+      {isPdfViewerOpen && project.pdfPath ? (
+        <div className="fixed inset-0 z-50 flex flex-col bg-(--bg)">
+          <div className="flex h-14 shrink-0 items-center justify-between border-b border-(--border) bg-(--shell) px-5">
+            <div className="flex items-center gap-3">
+              <FileText className="text-(--accent-pink)" size={18} />
+              <span className="text-sm font-medium">{project.pdfFilename}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <a
+                className="inline-flex h-9 items-center gap-2 rounded-lg border border-(--border) bg-(--surface) px-3 text-sm text-(--muted) transition hover:text-(--text)"
+                download={project.pdfFilename}
+                href={`/api/projects/${project.id}/pdf/download`}
+              >
+                <Download size={15} />
+                Download
+              </a>
+              <button
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-(--border) bg-(--surface) text-(--muted) transition hover:text-(--text)"
+                onClick={() => setIsPdfViewerOpen(false)}
+                title="Close PDF viewer"
+                type="button"
+              >
+                <X size={17} />
+              </button>
+            </div>
+          </div>
+          <iframe
+            className="h-full w-full flex-1 border-0"
+            src={`/api/projects/${project.id}/pdf`}
+            title={project.pdfFilename ?? "Pattern PDF"}
+          />
+        </div>
+      ) : null}
     </section>
   );
 }
