@@ -182,11 +182,13 @@ Worked on:
 - Service worker implementation (`sw.js`) and dynamic production registration.
 - Decoupled server database dependencies to resolve Hono router type compiler check errors.
 - Documented self-hosted Docker deployment commands and volume guides in `README.md`.
+- Rewrote `README.md` as a clean, user-facing document for GitHub and added `README_DOCKER.md` for Docker Hub.
 
 Completed:
 - PWA installability and offline assets capabilities.
 - Production containerized Docker compose setup.
 - App type verification checking and testing suite pass.
+- User-facing documentation for GitHub and Docker Hub.
 
 Decisions made:
 - Exclude live database `/api/` query endpoints from service worker caching.

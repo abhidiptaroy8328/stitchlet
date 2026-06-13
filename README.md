@@ -1,99 +1,54 @@
 <p align="center">
-  <img src="./public/logo.png" alt="Stitchlet logo" width="128" />
+  <img src="./public/logo.png" alt="Stitchlet logo" width="300" />
 </p>
 
 # Stitchlet
 
-Stitchlet is a self-hosted crochet companion for organizing projects, PDFs, counters, photos, materials, and notes on your own server.
+Stitchlet is a private, self-hosted crochet project companion designed to run on your own hardware (mini-PC, NAS, home server, or local computer). It keeps all of your pattern PDFs, progress photos, stitch counters, and notes local, cozy, and completely under your control. No surprise cloud subscriptions, no telemetry, just your projects.
 
-The core project CRUD, counters, project photos, and custom material entries are all working and backed by SQLite. PDF viewing is the next piece.
+## Core Features
 
-## Stack
+* 📱 **Cozy, Responsive UI** – Sleek charcoal-themed dashboard with grid and list views, optimized for both desktop monitors and amigurumi-friendly mobile screens.
+* 🔍 **Smart Dashboard** – Reactive searching, status filtering (Active, Paused, Finished, Frogged), and sorting (updated date, project title, status) to organize large libraries instantly.
+* 📄 **In-App PDF Viewer** – Upload pattern PDFs, view them in an embedded full-screen modal directly inside your project page, or download them at any time.
+* 📸 **Progress Photos** – Keep visual records of your work. Upload and replace cover photos with responsive, square CSS crops.
+* ⏱️ **Active Counters** – Add multiple round or row counters per project with custom names, target values, completion states, and large tap targets designed to be used while actively crocheting.
+* 🧶 **Material Checklists** – Quick metadata fields for yarn type, yarn weight, hook size, colors, and finished dimensions, plus custom list sections for assembly details and yarn substitutions.
+* 💾 **One-Click Backup & Restore** – Download a compressed ZIP archive containing your SQLite database and all uploaded media files directly from the UI settings.
+* 📶 **Progressive Web App (PWA)** – Installable as a standalone app with Network-First Service Worker asset caching, allowing the app shell to launch instantly and work offline.
 
-- Vite
-- React
-- TypeScript
-- Tailwind CSS
-- React Router
-- Hono
-- Drizzle ORM
-- SQLite
+---
 
-## Getting Started
+## Deploying with Docker Compose (Recommended)
 
-Install dependencies:
+Docker is the easiest way to deploy Stitchlet on a home server or NAS (such as Unraid, Synology, or TrueNAS). 
+
+Create a `docker-compose.yml` file:
+
+```yaml
+services:
+  stitchlet:
+    image: pinkpixeldev/stitchlet:latest
+    container_name: stitchlet
+    ports:
+      - "6497:6497"
+    volumes:
+      - ./data:/app/data
+      - ./uploads:/app/uploads
+      - ./backups:/app/backups
+    environment:
+      - NODE_ENV=production
+      - PORT=6497
+    restart: unless-stopped
+```
+
+Run the container:
 
 ```bash
-npm install
+docker compose up -d
 ```
 
-Run the frontend and API in development:
-
-```bash
-npm run dev
-```
-
-Open:
-
-```txt
-http://localhost:6497
-```
-
-The Vite dev server runs on port `6497` and proxies `/api` requests to the Hono server on port `6498`.
-
-## Project Structure
-
-```txt
-src/
-  client/
-    components/
-    lib/
-    pages/
-    styles.css
-
-  server/
-    db/
-    routes/
-    index.ts
-
-  shared/
-    sample-data.ts
-    schemas.ts
-```
-
-## Current Status
-
-Implemented:
-
-- Minimal dark/light app shell with dotted grid background
-- Dashboard route with live project data, reactive search, status filtering, and sorting
-- Create project route
-- Project detail route
-- Settings route with database and media backup export/restore controls
-- Shared project/counter/custom section schemas
-- Drizzle SQLite schema
-- Hono API
-- SQLite-backed project create, list, read, update, and delete
-- SQLite-backed counter create, list, update, and delete (with increment, decrement, reset, complete)
-- Project photo upload, replace, remove — stored locally, served via API
-- Project photo thumbnails on dashboard cards (grid and list view)
-- Dashboard list/grid view toggle
-- Custom material entries (add/remove) — stored in `custom_sections` table
-- PDF upload, inline viewer (iframe modal), and download — stored locally, served via API
-- PWA installability and dynamic offline-first asset caching (via Service Worker)
-- Production Docker containerization and Docker Compose configurations
-
-## Docker Deployment
-
-Stitchlet is designed to run self-hosted on your NAS, mini-PC, or home server.
-
-Deploy via Docker Compose:
-
-```bash
-docker compose up -d --build
-```
-
-Access the application on:
+Open your browser and navigate to:
 
 ```txt
 http://localhost:6497
@@ -101,32 +56,65 @@ http://localhost:6497
 
 ### Mounted Volumes
 
-Docker Compose creates three bind mounts on the host to persist your data:
+Three folders are created in your compose directory to persist all library data outside the container:
+* `data/` – Houses your SQLite database file (`stitchlet.db`).
+* `uploads/` – Stores pattern PDFs and progress photos.
+* `backups/` – Temporary staging directory for exported archives.
 
-- `./data/` -> Contains the SQLite database file (`stitchlet.db`).
-- `./uploads/` -> Contains project-specific pattern PDFs and photos.
-- `./backups/` -> Destination folder for settings backups.
+---
 
-## PWA & Installability
+## Local Development & Setup
 
-Stitchlet includes a web app manifest and a dynamic service worker. To install as a PWA, run Stitchlet over `localhost` or deploy behind an HTTPS reverse proxy (such as Caddy or Tailscale Serve).
+If you prefer to run Stitchlet natively on your machine:
 
-## Theme
+### Prerequisites
 
-Dark mode is the default.
+* Node.js v22+
+* npm
 
-Dark theme:
+### Running the App
 
-- Background: `#121212`
-- Pink: `#FC9EB1`
-- Purple: `#D09CDE`
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-Light theme:
+2. Start the development environment (runs Vite and Hono concurrently):
+   ```bash
+   npm run dev
+   ```
 
-- Background: `#FEF4E8`
-- Pink: `#F27593`
-- Purple: `#9058A4`
+3. Open:
+   ```txt
+   http://localhost:6497
+   ```
+
+The Vite development server hosts the frontend on port `6497` and proxies backend API calls to Hono on port `6498`.
+
+---
+
+## PWA & Private Remote Access
+
+For full PWA installability, browsers require that the app is accessed over `localhost` or served via HTTPS:
+
+1. **Home Wi-Fi only**: Access Stitchlet on your local network using the host IP (e.g. `http://192.168.1.50:6497`).
+2. **Private Remote Access (Tailscale)**: If you want to use your counters and view patterns while away from home, Tailscale is recommended. Run `tailscale serve` on your host to securely route HTTPS traffic within your private tailnet without opening router ports.
+3. **Domain Routing**: Use a reverse proxy like Caddy to configure SSL certificates for your host domain.
+
+---
+
+## Backing Up Your Library
+
+Because Stitchlet is private and local, you are in charge of your data. 
+
+1. **Via UI Settings**: Navigate to **Settings > Backup & Restore** and click **Export Backup**. This will compile a zip file of your SQLite database and all uploaded project media.
+2. **Restoring**: Choose the exported ZIP file inside settings. Stitchlet will automatically unpack the files, close existing SQLite connections, overwrite files, and trigger a server reboot sequence.
+3. **Automated Host Backups**: Simply back up the mounted `./data` and `./uploads` directories using your home server's backup scheduler.
+
+---
 
 ## License
 
-Apache-2.0
+Apache 2.0
+
+Made with 💖 by [Pink Pixel](https://pinkpixel.dev)
